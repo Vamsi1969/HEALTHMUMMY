@@ -24,8 +24,10 @@ services:
         value: 3.13
 
   # ── Frontend Static Site ──────────────────────────────────────
-  - type: static_site
+  - type: web
     name: health-assistant-frontend
+    runtime: static
+    plan: free
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     envVars:
