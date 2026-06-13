@@ -9,8 +9,8 @@ services:
     env: python
     region: oregon
     plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    buildCommand: cd backend && pip install -r requirements.txt
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: DATABASE_URL
         value: sqlite:///./health_assistant.db
@@ -21,14 +21,14 @@ services:
       - key: CORS_ORIGINS
         value: '["https://health-assistant-frontend.onrender.com","http://localhost:5173"]'
       - key: PYTHON_VERSION
-        value: 3.13
+        value: 3.12
 
   # ── Frontend Static Site ──────────────────────────────────────
   - type: web
     name: health-assistant-frontend
     runtime: static
-    buildCommand: npm install && npm run build
-    staticPublishPath: ./dist
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/dist
     envVars:
       - key: VITE_API_URL
         value: https://health-assistant-backend.onrender.com/api
