@@ -13,7 +13,7 @@ services:
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: DATABASE_URL
-        value: sqlite:///./data/health_assistant.db
+        value: sqlite:///./health_assistant.db
       - key: JWT_SECRET
         generateValue: true
       - key: API_KEY
@@ -22,16 +22,11 @@ services:
         value: '["https://health-assistant-frontend.onrender.com","http://localhost:5173"]'
       - key: PYTHON_VERSION
         value: 3.13
-    disk:
-      name: data
-      mountPath: /app/data
-      sizeGB: 1
 
   # ── Frontend Static Site ──────────────────────────────────────
   - type: web
     name: health-assistant-frontend
     env: static
-    region: oregon
     plan: free
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
