@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: health-assistant-backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    environment:
+      - DATABASE_URL=sqlite:///./data/health_assistant.db
+    volumes:
+      - ./backend:/app
+      - ./backend/data:/app/data
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    restart: unless-stopped
+
+  frontend:
+    image: node:24-alpine
+    container_name: health-assistant-frontend
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5173:5173"
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    depends_on:
+      - backend
+    restart: unless-stopped

@@ -1,0 +1,47 @@
+# Render Blueprint — Free Tier Deployment
+# Deploys both the React frontend (static site) and FastAPI backend (web service)
+# Sign up at https://render.com → "Blueprint" → connect this repo
+
+services:
+  # ── Backend API ───────────────────────────────────────────────
+  - type: web
+    name: health-assistant-backend
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        value: sqlite:///./data/health_assistant.db
+      - key: JWT_SECRET
+        generateValue: true
+      - key: API_KEY
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: '["https://health-assistant-frontend.onrender.com","http://localhost:5173"]'
+      - key: PYTHON_VERSION
+        value: 3.13
+    disk:
+      name: data
+      mountPath: /app/data
+      sizeGB: 1
+
+  # ── Frontend Static Site ──────────────────────────────────────
+  - type: web
+    name: health-assistant-frontend
+    env: static
+    region: oregon
+    plan: free
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://health-assistant-backend.onrender.com/api
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
